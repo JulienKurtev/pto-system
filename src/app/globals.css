@@ -1,0 +1,299 @@
+@import "tailwindcss";
+
+/* `dark:` follows the resolved theme set on <html> by the script in layout.tsx. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ---------------------------------------------------------------------------
+   Material 3 color tokens (Google baseline palette).
+   --------------------------------------------------------------------------- */
+:root {
+  --surface: #f8fafd;
+  --surface-container-low: #f0f4f9;
+  --surface-container: #e9eef6;
+  --surface-container-high: #dde3ea;
+  --card: #ffffff;
+  --on-surface: #1f1f1f;
+  --on-surface-variant: #444746;
+  --outline: #747775;
+  --outline-variant: #c4c7c5;
+  --primary: #0b57d0;
+  --on-primary: #ffffff;
+  --primary-container: #d3e3fd;
+  --on-primary-container: #041e49;
+  --secondary-container: #c2e7ff;
+  --on-secondary-container: #001d35;
+  --error: #b3261e;
+  --error-container: #f9dedc;
+  --on-error-container: #410e0b;
+  --success: #146c2e;
+  --success-container: #c4eed0;
+  --on-success-container: #072711;
+  --warning-container: #ffdf99;
+  --on-warning-container: #251a00;
+
+  --shadow-1: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 1px 3px 1px rgb(0 0 0 / 0.15);
+  /* Cards: hairline edge + soft lift, so white cards separate from the page. */
+  --shadow-card:
+    0 0 0 1px rgb(0 0 0 / 0.04), 0 1px 3px rgb(0 0 0 / 0.08),
+    0 6px 16px rgb(0 0 0 / 0.07);
+}
+
+[data-theme="dark"] {
+  --surface: #131314;
+  --surface-container-low: #1b1b1c;
+  --surface-container: #1e1f20;
+  --surface-container-high: #282a2c;
+  --card: #1e1f20;
+  --on-surface: #e3e3e3;
+  --on-surface-variant: #c4c7c5;
+  --outline: #8e918f;
+  --outline-variant: #444746;
+  --primary: #a8c7fa;
+  --on-primary: #062e6f;
+  --primary-container: #0842a0;
+  --on-primary-container: #d3e3fd;
+  --secondary-container: #004a77;
+  --on-secondary-container: #c2e7ff;
+  --error: #f2b8b5;
+  --error-container: #8c1d18;
+  --on-error-container: #f9dedc;
+  --success: #6dd58c;
+  --success-container: #0f5223;
+  --on-success-container: #c4eed0;
+  --warning-container: #5c4300;
+  --on-warning-container: #ffdf99;
+
+  /* Shadows barely read on dark surfaces; go darker and add a light edge. */
+  --shadow-1:
+    0 0 0 1px rgb(255 255 255 / 0.06), 0 2px 6px rgb(0 0 0 / 0.5),
+    0 8px 24px rgb(0 0 0 / 0.5);
+  --shadow-card:
+    0 0 0 1px rgb(255 255 255 / 0.05), 0 1px 3px rgb(0 0 0 / 0.5),
+    0 6px 16px rgb(0 0 0 / 0.4);
+}
+
+@theme inline {
+  --color-surface: var(--surface);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-card: var(--card);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary-container: var(--on-secondary-container);
+  --color-error: var(--error);
+  --color-error-container: var(--error-container);
+  --color-on-error-container: var(--on-error-container);
+  --color-success: var(--success);
+  --color-success-container: var(--success-container);
+  --color-on-success-container: var(--on-success-container);
+  --color-warning-container: var(--warning-container);
+  --color-on-warning-container: var(--on-warning-container);
+  --font-sans: var(--font-google-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@theme {
+  /* M3 "emphasized" easing; also exposed as the `ease-emphasized` utility. */
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+}
+
+body {
+  background: var(--surface);
+  color: var(--on-surface);
+}
+
+::selection {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   Components
+   --------------------------------------------------------------------------- */
+/* M3 state layer: hover/press overlay in the element's own text color. */
+@utility state-layer {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: currentColor;
+    opacity: 0;
+    transition: opacity 200ms var(--ease-emphasized);
+    pointer-events: none;
+  }
+  &:hover:not(:disabled)::after {
+    opacity: 0.08;
+  }
+  &:active:not(:disabled)::after {
+    opacity: 0.12;
+  }
+}
+
+@layer components {
+  .btn,
+  .btn-secondary,
+  .btn-tonal,
+  .btn-text {
+    @apply state-layer inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-full px-6 text-sm font-medium whitespace-nowrap transition-[box-shadow,background-color,color] duration-200 ease-emphasized select-none disabled:cursor-default disabled:opacity-40;
+  }
+  /* Filled */
+  .btn {
+    @apply bg-primary text-on-primary hover:shadow-(--shadow-1);
+  }
+  /* Outlined */
+  .btn-secondary {
+    @apply border border-outline text-primary;
+  }
+  .btn-tonal {
+    @apply bg-secondary-container text-on-secondary-container;
+  }
+  .btn-text {
+    @apply px-3 text-primary;
+  }
+  .icon-btn {
+    @apply state-layer inline-flex size-10 cursor-pointer items-center justify-center rounded-full text-on-surface-variant;
+  }
+
+  .card {
+    @apply rounded-3xl bg-card p-6;
+    box-shadow: var(--shadow-card);
+  }
+
+  .input {
+    @apply h-11 rounded-lg border border-outline bg-transparent px-3 text-base font-normal text-on-surface transition-[border-color,box-shadow] duration-200 ease-emphasized outline-none placeholder:text-on-surface-variant/70 hover:border-on-surface focus:border-primary focus:shadow-[inset_0_0_0_1px_var(--primary)];
+  }
+  textarea.input {
+    @apply h-auto py-2.5;
+  }
+
+  .label {
+    @apply flex flex-col gap-1.5 text-sm font-medium text-on-surface-variant;
+  }
+
+  .skeleton {
+    @apply animate-pulse rounded-2xl bg-surface-container;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   View transitions (see node_modules/next/dist/docs/01-app/02-guides/view-transitions.md)
+   --------------------------------------------------------------------------- */
+::view-transition {
+  pointer-events: none;
+}
+
+/* Header stays put while content moves. */
+::view-transition-group(app-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(app-header) {
+  display: none;
+}
+::view-transition-new(app-header) {
+  animation: none;
+}
+
+/* Theme switch: quick crossfade of the whole page. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 250ms;
+  animation-timing-function: var(--ease-emphasized);
+}
+
+/* Suspense reveal: skeleton leaves fast, content rises in gently. */
+::view-transition-old(.slide-down) {
+  animation:
+    150ms ease-out both fade reverse,
+    150ms ease-out both slide-y reverse;
+}
+::view-transition-new(.slide-up) {
+  animation:
+    210ms ease-in 150ms both fade,
+    400ms var(--ease-emphasized) both slide-y;
+}
+
+/* Calendar month paging. */
+::view-transition-old(.nav-forward) {
+  --slide-offset: -60px;
+  animation:
+    150ms ease-in both fade reverse,
+    400ms var(--ease-emphasized) both slide reverse;
+}
+::view-transition-new(.nav-forward) {
+  --slide-offset: 60px;
+  animation:
+    210ms ease-out 150ms both fade,
+    400ms var(--ease-emphasized) both slide;
+}
+::view-transition-old(.nav-back) {
+  --slide-offset: 60px;
+  animation:
+    150ms ease-in both fade reverse,
+    400ms var(--ease-emphasized) both slide reverse;
+}
+::view-transition-new(.nav-back) {
+  --slide-offset: -60px;
+  animation:
+    210ms ease-out 150ms both fade,
+    400ms var(--ease-emphasized) both slide;
+}
+
+@keyframes fade {
+  from {
+    filter: blur(3px);
+    opacity: 0;
+  }
+  to {
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+@keyframes slide-y {
+  from {
+    transform: translateY(10px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes slide {
+  from {
+    translate: var(--slide-offset);
+  }
+  to {
+    translate: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0s !important;
+  }
+}
